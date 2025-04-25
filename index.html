@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de Adivinanza</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f8ff;
+        }
+        #juego {
+            background: white;
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        input {
+            padding: 10px;
+            font-size: 16px;
+            width: 100px;
+        }
+        #mensajes {
+            min-height: 50px;
+            margin: 20px 0;
+        }
+        #pista {
+            font-weight: bold;
+            margin: 15px 0;
+            font-size: 18px;
+        }
+        .mayor { color: #28a745; }
+        .menor { color: #dc3545; }
+    </style>
+</head>
+<body>
+    <h1>Juego de Adivinanza</h1>
+    <div id="juego">
+        <button id="iniciarBtn">Comenzar Juego</button>
+    </div>
+    <div id="mensajes"></div>
+    
+    <script>
+        // Variables del juego
+        let numeroAdivinar;
+        let intentosRestantes;
+        
+        // Función para iniciar el juego
+        function iniciarJuego() {
+            // Configuración inicial
+            numeroAdivinar = Math.floor(Math.random() * 100) + 1;
+            intentosRestantes = 5;
+            
+            // Limpiar mensajes anteriores
+            document.getElementById('mensajes').innerHTML = '';
+            
+            // Crear interfaz de juego
+            document.getElementById('juego').innerHTML = `
+                <p>Intentos restantes: <strong id="intentos">${intentosRestantes}</strong></p>
+                <input type="number" id="numeroInput" min="1" max="100" placeholder="1-100">
+                <button id="adivinarBtn">Adivinar</button>
+                <div id="pista"></div>
+            `;
+            
+            // Configurar eventos
+            document.getElementById('adivinarBtn').addEventListener('click', verificarIntento);
+            document.getElementById('numeroInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') verificarIntento();
+            });
+            
+            // Enfocar el input
+            document.getElementById('numeroInput').focus();
+        }
+        
+        // Función para verificar el intento
+        function verificarIntento() {
+            const input = document.getElementById('numeroInput');
+            const numero = parseInt(input.value);
+            const pistaElement = document.getElementById('pista');
+            const intentosElement = document.getElementById('intentos');
+            
+            // Validar entrada
+            if (isNaN(numero)) {
+                alert('Por favor ingresa un número válido');
+                return;
+            }
+            
+            if (numero < 1 || numero > 100) {
+                alert('El número debe estar entre 1 y 100');
+                return;
+            }
+            
+            // Verificar si acertó
+            if (numero === numeroAdivinar) {
+                document.getElementById('juego').innerHTML = `
+                    <h2>¡Ganaste!</h2>
+                    <p>El número era ${numeroAdivinar}</p>
+                    <button onclick="iniciarJuego()">Jugar otra vez</button>
+                `;
+                return;
+            }
+            
+            // Dar pista y actualizar intentos
+            intentosRestantes--;
+            intentosElement.textContent = intentosRestantes;
+            
+            if (numero < numeroAdivinar) {
+                pistaElement.textContent = 'El número es mayor';
+                pistaElement.className = 'mayor';
+            } else {
+                pistaElement.textContent = 'El número es menor';
+                pistaElement.className = 'menor';
+            }
+            
+            // Verificar si se acabaron los intentos
+            if (intentosRestantes <= 0) {
+                document.getElementById('juego').innerHTML = `
+                    <h2>¡Perdiste!</h2>
+                    <p>El número era ${numeroAdivinar}</p>
+                    <button onclick="iniciarJuego()">Intentar de nuevo</button>
+                `;
+            }
+            
+            // Limpiar input
+            input.value = '';
+            input.focus();
+        }
+        
+        // Configurar botón de inicio
+        document.getElementById('iniciarBtn').addEventListener('click', iniciarJuego);
+    </script>
+</body>
+</html>
